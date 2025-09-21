@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Simple Gmail Notes",
   "short_name": "SGNotes",
   "description": "__MSG_extDescription__",
@@ -13,64 +13,71 @@
   "permissions": [
     "storage",
     "activeTab",
-    "identity",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://inbox.google.com/*",
     "https://www.googleapis.com/*",
     "https://accounts.google.com/*"
   ],
   "web_accessible_resources": [
-    "lib/jquery-3.1.0.min.js",
-    "lib/jquery.popupoverlay.js",
-    "lib/moment.min.js",
-    "lib/lru.js",
-    "lib/tinymce/tinymce.min.js",
-    "lib/tinymce/jquery.tinymce.min.js",
-    "lib/tinymce/plugins/lists/plugin.min.js",
-    "lib/tinymce/plugins/link/plugin.min.js",
-    "lib/tinymce/skins/lightgray/*",
-    "lib/tinymce/themes/modern/theme.min.js",
-    "lib/featherlight/featherlight.min.js",
-    "lib/featherlight/featherlight.min.css",
-    "css/style.css",
-    "css/bulma.min.css",
-    "common/gmail-sgn-dom.js",
-    "common/gmail-sgn-page.js",
-    "common/shared-common.js",
-    "page.js",
-    "image/donation.24.png",
-    "image/table-sort.png",
-    "image/color-picker.24.png",
-    "image/modal-loading.gif",
-    "image/Google-Drive-icon.png",
-    "image/share.24.png",
-    "image/shared.24.png",
-    "image/search.24.png",
-    "image/logout.24.png",
-    "image/revoke.24.png",
-    "image/calendar.24.png",
-    "image/bart-logo.24.png",
-    "image/preferences.24.png",
-    "image/delete.24.png",
-    "image/chat.24.png",
-    "image/share-auto.24.png",
-    "image/share-outdated.24.png",
-    "image/opportunity.png",
-    "image/note-timestamp.png",
-    "image/warning.3x.png",
-    "image/crm-logo.24.png",
-    "image/template.png",
-    "image/arrow-right.png",
-    "image/comment-icon.png",
-    "image/new-comment.png",
-    "image/login-comment-icon.3x.png"
+    {
+      "resources": [
+        "lib/jquery-3.1.0.min.js",
+        "lib/jquery.popupoverlay.js",
+        "lib/moment.min.js",
+        "lib/lru.js",
+        "lib/tinymce/tinymce.min.js",
+        "lib/tinymce/jquery.tinymce.min.js",
+        "lib/tinymce/plugins/lists/plugin.min.js",
+        "lib/tinymce/plugins/link/plugin.min.js",
+        "lib/tinymce/skins/lightgray/*",
+        "lib/tinymce/themes/modern/theme.min.js",
+        "lib/featherlight/featherlight.min.js",
+        "lib/featherlight/featherlight.min.css",
+        "css/style.css",
+        "css/bulma.min.css",
+        "common/gmail-sgn-dom.js",
+        "common/gmail-sgn-page.js",
+        "common/shared-common.js",
+        "page.js",
+        "image/donation.24.png",
+        "image/table-sort.png",
+        "image/color-picker.24.png",
+        "image/modal-loading.gif",
+        "image/Google-Drive-icon.png",
+        "image/share.24.png",
+        "image/shared.24.png",
+        "image/search.24.png",
+        "image/logout.24.png",
+        "image/revoke.24.png",
+        "image/calendar.24.png",
+        "image/bart-logo.24.png",
+        "image/preferences.24.png",
+        "image/delete.24.png",
+        "image/chat.24.png",
+        "image/share-auto.24.png",
+        "image/share-outdated.24.png",
+        "image/opportunity.png",
+        "image/note-timestamp.png",
+        "image/warning.3x.png",
+        "image/crm-logo.24.png",
+        "image/template.png",
+        "image/arrow-right.png",
+        "image/comment-icon.png",
+        "image/new-comment.png",
+        "image/login-comment-icon.3x.png",
+        "patches/trustedhtml-fix.js"
+      ],
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*"
+      ]
+    }
   ],
   "background": {
-    "scripts": [
-      "lib/jquery-3.1.0.min.js",
-      "common/shared-common.js",
-      "background.js",
-      "background-event.js"
-    ],
-    "persistent": false
+    "service_worker": "service-worker.js"
   },
   "content_scripts": [
     {
@@ -79,6 +86,7 @@
         "https://inbox.google.com/*"
       ],
       "js": [
+        "patches/trustedhtml-fix.js",
         "lib/jquery-3.1.0.min.js",
         "lib/jquery.popupoverlay.js",
         "lib/jquery.simple-color.js",
@@ -95,7 +103,7 @@
       "run_at": "document_end"
     }
   ],
-  "browser_action": {
+  "action": {
     "default_icon": "image/icon.128.png",
     "default_popup": "popup.html"
   },

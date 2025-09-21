@@ -1,7 +1,11 @@
 $(document).ready(function(){
   var SGNP = SimpleGmailNotes;
 
-  SGNC.getBrowser().browserAction.setBadgeText({"text": ""});
+  if (chrome.action && typeof chrome.action.setBadgeText === 'function') {
+    chrome.action.setBadgeText({text: ''});
+  } else if (SGNC.getBrowser().browserAction && SGNC.getBrowser().browserAction.setBadgeText) {
+    SGNC.getBrowser().browserAction.setBadgeText({"text": ""});
+  }
 
   $(".sgn-menu-table a").attr("target", "_blank");
   $("#open_options").click(function(){

@@ -6,24 +6,32 @@
 //this script would be put into page script, better use a strong naming 
 //convention
 /*********** for page, content, background *********/
+var globalScope = (typeof self !== 'undefined') ? self : this;
+
 if (typeof SimpleGmailNotes === 'undefined' || SimpleGmailNotes === null) {
   SimpleGmailNotes = {};
 }
 
-SimpleGmailNotes.isDebug = function(callback){
+if (typeof SimpleGmailNotes.$ === 'undefined' && typeof globalScope !== 'undefined' && globalScope.jQuery) {
+  SimpleGmailNotes.$ = globalScope.jQuery;
+}
+
+SimpleGmailNotes.isDebug = function(){
   // return true;
   return false;
 };
 
 SimpleGmailNotes.settings = {
   CLIENT_ID: "38131814991-p4u809qrr5ee1bsehregd4os69jf2n7i.apps.googleusercontent.com",
-  SCOPE: 'https://www.googleapis.com/auth/drive.file',
+  SCOPE: 'https://www.googleapis.com/auth/drive',
 };
 
 SimpleGmailNotes.offlineMessage = "WARNING! Simple Gmail Notes is currently unavailable.\n\n<br/>" +
                                    "Please <a href=''>refresh</a> this page to remove the warning. ";
 
-if(window.location.href.startsWith("moz-extension:"))
+if (typeof window === 'undefined') {
+  SimpleGmailNotes.IS_CHROME = true;
+} else if(window.location.href.startsWith("moz-extension:"))
   SimpleGmailNotes.IS_CHROME = false;
 else
   SimpleGmailNotes.IS_CHROME = !!window.chrome;
@@ -37,11 +45,15 @@ SimpleGmailNotes.isChrome = function(){
 
 // ********************  for page script & content script
 SimpleGmailNotes.isInbox = function(){
+  if (typeof window === 'undefined') return false;
   return window.location.href.startsWith("https://inbox.google.com");
 };
 
 SimpleGmailNotes.isNewGmail = function(){
-  result = false;
+  var result = false;
+  if (typeof window === 'undefined' || typeof top === 'undefined')
+    return false;
+
   if(SimpleGmailNotes.isInbox())
     result = false;
   else if(top.document.getElementById("embedded_data_iframe") !== null)
@@ -55,12 +67,12 @@ SimpleGmailNotes.isNewGmail = function(){
 };
 
 SimpleGmailNotes.isClassicGmail = function(){
+  if (typeof window === 'undefined')
+    return false;
   if(SimpleGmailNotes.isInbox())
-    result = false;
-  else
-    result = !SimpleGmailNotes.isNewGmail();
+    return false;
 
-  return result;
+  return !SimpleGmailNotes.isNewGmail();
 };
 
 SimpleGmailNotes.getTinyMCEContainer = function(){
@@ -498,6 +510,10 @@ SimpleGmailNotes.getStorage = function(sender, key) {
 
 
 SimpleGmailNotes.getPopupDimensions = function(newWindowWidth, newWindowHeight){
+  if (typeof window === 'undefined') {
+    return {left: 0, top: 0};
+  }
+
   var dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   var dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
   var width = window.innerWidth ? window.innerWidth : window.screen.width;

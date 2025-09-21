@@ -116,6 +116,9 @@ var sendBackgroundMessage = function(message){
 
   if(isRuntimeAlive()){
     SGNC.getBrowser().runtime.sendMessage(message, function(response){
+      if (chrome.runtime && chrome.runtime.lastError) {
+        debugLog("Runtime message error", chrome.runtime.lastError.message);
+      }
       //debugLog("Message response", response);
     });
   }
@@ -127,20 +130,33 @@ var sendBackgroundMessage = function(message){
 
 //https://stackoverflow.com/questions/25840674/chrome-runtime-sendmessage-throws-exception-from-content-script-after-reloading
 var isRuntimeAlive = function(){
-  return SGNC.getBrowser().runtime && !!SGNC.getBrowser().runtime.getManifest();
+  try {
+    return SGNC.getBrowser().runtime && !!SGNC.getBrowser().runtime.getManifest();
+  } catch (e) {
+    return false;
+  }
 };
 
 var setupBackgroundEventsListener = function(callback) {
   SGNC.getBrowser().runtime.onMessage.addListener(
       function(request, sender, sendResponse) {
         callback(request);
+        if (typeof sendResponse === 'function') {
+          sendResponse({received: true});
+        }
         return true;
       }
   );
 };
 var addScript = function(scriptPath){
   var j = document.createElement('script');
-  j.src = SGNC.getBrowser().extension.getURL(scriptPath);
+  if (SGNC.getBrowser().runtime && SGNC.getBrowser().runtime.getURL) {
+    j.src = SGNC.getBrowser().runtime.getURL(scriptPath);
+  } else if (SGNC.getBrowser().extension && SGNC.getBrowser().extension.getURL) {
+    j.src = SGNC.getBrowser().extension.getURL(scriptPath);
+  } else {
+    j.src = scriptPath;
+  }
   j.async = false;
   j.defer = false;
   (document.head || document.documentElement).appendChild(j);
@@ -928,26 +944,62 @@ var updateGmailNotePosition = function(injectionNode, notePosition){
     //inside will have problem
     return;
 
-  if(notePosition == "side-top" || notePosition == "side-bottom"){
-    if(notePosition == "side-top"){
-      SGNC.getSidebarNode().prepend(injectionNode);
-    }else{
-      SGNC.getSidebarNode().append(injectionNode);
-    }
-    injectionNode.addClass("sgn_sidebar");
-    injectionNode.parent().find(".y4").css("display", "none");
-  }else{
+  var inserted = false;
 
-    if(notePosition == "bottom"){
-      $(".nH.aHU:visible").append(injectionNode);
-    }else{
-      $(".nH.if:visible, .nH.aBy:visible").prepend(injectionNode);  //hopefully this one is stable
+  if(notePosition == "side-top" || notePosition == "side-bottom"){
+    var sidebar = SGNC.getSidebarNode();
+    if(sidebar && sidebar.length){
+      if(notePosition == "side-top"){
+        sidebar.first().prepend(injectionNode);
+      }else{
+        sidebar.first().append(injectionNode);
+      }
+      injectionNode.addClass("sgn_sidebar");
+      var parentNode = injectionNode.parent();
+      if(parentNode && parentNode.length){
+        parentNode.find(".y4").css("display", "none");
+      }
+      inserted = true;
     }
-    injectionNode.css("width", "auto");
-    //$(".sgn_prompt_logout").css("height", "auto");
-    
   }
 
+  if(!inserted){
+    injectionNode.removeClass("sgn_sidebar");
+    var primaryTargets;
+    if(notePosition == "bottom"){
+      primaryTargets = $(".nH.aHU:visible");
+    }else{
+      primaryTargets = $(".nH.if:visible, .nH.aBy:visible");
+    }
+
+    primaryTargets = primaryTargets.filter(':visible');
+    if(primaryTargets.length){
+      if(notePosition == "bottom"){
+        primaryTargets.first().append(injectionNode);
+      } else {
+        primaryTargets.first().prepend(injectionNode);
+      }
+      inserted = true;
+    }
+  }
+
+  if(!inserted){
+    var fallback = $("div[role='main']:visible").first();
+    if(!fallback.length){
+      fallback = $("div[role='main']").first();
+    }
+    if(!fallback.length){
+      fallback = $('body');
+    }
+
+    if(notePosition == "bottom"){
+      fallback.append(injectionNode);
+    } else {
+      fallback.prepend(injectionNode);
+    }
+  }
+
+  injectionNode.css("width", "auto");
   injectionNode.attr("data-note-position", notePosition);
 
 };
@@ -3729,7 +3781,7 @@ var setupListeners = function(){
 
   // Event listener for share email
   window.addEventListener('message', function(e) {
-    if (typeof e.data !== 'string' || !e.data.startsWith("sgncrm"))
+    if (typeof e.data !== 'string' || typeof e.data.startsWith !== 'function' || !e.data.startsWith("sgncrm"))
       return;
     
     var shareSuccessPrefix = "sgncrm:share_success:";
@@ -3830,7 +3882,7 @@ var setupListeners = function(){
 
   // event listern for sgn login
   window.addEventListener("message", function(e){
-    if(!e.data.startsWith("sgnlogin:"))
+    if (typeof e.data !== 'string' || typeof e.data.startsWith !== 'function' || !e.data.startsWith("sgnlogin:"))
       return;
 
     if (e.data.startsWith("sgnlogin:")) {
@@ -3899,6 +3951,7 @@ var setupPrintNote = function(printInfo) {
 };
 
 var _setupPage = function(){
+  addScript('patches/trustedhtml-fix.js');
   addScript('lib/jquery-3.1.0.min.js');
   addScript('lib/lru.js');
   addScript('common/gmail-sgn-page.js');
@@ -4007,4 +4060,3 @@ $(document).ready(function(){
 });
 
 debugLog("Finished content script (common)");
-

@@ -8,22 +8,18 @@
  */
 
 //For messaging between background and content script
-$(window).on('load', function(){
-  SGNC.getBrowser().runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      debugLog("Get message to background", request);
-      sender = {worker: sender, email: request.email};
+SGNC.getBrowser().runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  debugLog("Get message to background", request);
+  sender = {worker: sender, email: request.email};
 
-      handleRequest(sender, request);
-      return true;
-  });
-
-
-  //var preferences = getPreferences();
-  //preferences['debugBackgroundInfo'] = "Extension Version: " + SGNC.getExtensionVersion();
-  var message = "Extension Version: " + SGNC.getExtensionVersion();
-  SGNC.appendLog(message, debugBackGroundScope);
+  handleRequest(sender, request);
+  return true;
 });
+
+//var preferences = getPreferences();
+//preferences['debugBackgroundInfo'] = "Extension Version: " + SGNC.getExtensionVersion();
+var message = "Extension Version: " + SGNC.getExtensionVersion();
+SGNC.appendLog(message, debugBackGroundScope);
 
 SGNC.getBrowser().runtime.onInstalled.addListener(function(details){
     var preferences = getPreferences();
@@ -40,7 +36,11 @@ SGNC.getBrowser().runtime.onInstalled.addListener(function(details){
       preferences["upgrade_notification_done"] = true;
     } 
     else if(details.reason == "update"){
-      SGNC.getBrowser().browserAction.setBadgeText({"text": gBadgeText});
+      if (chrome.action && typeof chrome.action.setBadgeText === 'function') {
+        chrome.action.setBadgeText({text: gBadgeText || ''});
+      } else if (SGNC.getBrowser().browserAction && SGNC.getBrowser().browserAction.setBadgeText) {
+        SGNC.getBrowser().browserAction.setBadgeText({"text": gBadgeText});
+      }
       preferences["install_notification_done"] = true;
       preferences["upgrade_notification_done"] = "";
       /*
