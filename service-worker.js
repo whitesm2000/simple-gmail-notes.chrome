@@ -290,32 +290,19 @@ function bootstrapBackground() {
     return;
   }
   bootstrapped = true;
-  var sharedUrl = chrome.runtime.getURL('common/shared-common.js');
-  fetch(sharedUrl).then(function(resp){
-    console.log('[SGN] Prefetch shared-common status', resp.status);
-    return resp.blob();
-  }).then(function(blob){
-    return blob.text();
-  }).then(function(source){
-    const url = URL.createObjectURL(new Blob([source], {type: 'text/javascript'}));
-    try {
-      importScripts(
-        url,
-        chrome.runtime.getURL('background.js'),
-        chrome.runtime.getURL('background-event.js')
-      );
-    } catch (err) {
-      console.error('[SGN] Failed to bootstrap background scripts', err && err.message ? err.message : err, err && err.stack ? err.stack : '');
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  }).then(function(){
-    if (typeof SimpleGmailNotes !== 'undefined' && !SimpleGmailNotes.$) {
-      SimpleGmailNotes.$ = $;
-    }
-  }).catch(function(err){
-    console.error('[SGN] Prefetch shared-common failed', err);
-  });
+  try {
+    importScripts(
+      chrome.runtime.getURL('common/shared-common.js'),
+      chrome.runtime.getURL('background.js'),
+      chrome.runtime.getURL('background-event.js')
+    );
+  } catch (err) {
+    console.error('[SGN] Failed to bootstrap background scripts', err && err.message ? err.message : err, err && err.stack ? err.stack : '');
+  }
+
+  if (typeof SimpleGmailNotes !== 'undefined' && !SimpleGmailNotes.$) {
+    SimpleGmailNotes.$ = $;
+  }
 }
 
 function hydrateCache(callback) {

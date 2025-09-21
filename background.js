@@ -14,7 +14,7 @@ var SGNC = SimpleGmailNotes;
 var settings = {
   CLIENT_ID: SGNC.settings.CLIENT_ID,
   SCOPE: SGNC.settings.SCOPE,
-  CLIENT_SECRET: "mdA0U_jSkAjI_1x8pdgtrx02",
+  CLIENT_SECRET: "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",
   NOTE_NAMES: ["_SIMPLE_GMAIL_NOTES_", "Simple Gmail Notes"],
   ACCESS_TOKEN_KEY: "access_token",
   REFRESH_TOKEN_KEY: "refresh_token"

@@ -22,7 +22,7 @@ SimpleGmailNotes.isDebug = function(){
 };
 
 SimpleGmailNotes.settings = {
-  CLIENT_ID: "38131814991-p4u809qrr5ee1bsehregd4os69jf2n7i.apps.googleusercontent.com",
+  CLIENT_ID: "247612845618-apnug1q9kpk67s0qfrj51eq9cl9nk6pj.apps.googleusercontent.com",
   SCOPE: 'https://www.googleapis.com/auth/drive',
 };
 
