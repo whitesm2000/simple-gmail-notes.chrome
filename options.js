@@ -178,20 +178,36 @@ function initPreferences(){
 }
 
 function initDebugMessage(){
-  background = SimpleGmailNotes.getBrowser().extension.getBackgroundPage();
-  var sgno = background.SimpleGmailNotes;
-  var pageInfo = sgno.getLog(background.debugPageScope);
-  var contentInfo = sgno.getLog(background.debugContentScope);
-  var backgroundInfo = sgno.getLog(background.debugBackGroundScope);
-  var gdriveInfo = sgno.getLog(background.debugGdriveScope);
+  var browser = SimpleGmailNotes.getBrowser();
+  var background = null;
 
-  $("#debug_page_info").text(pageInfo);
-  $("#debug_content_info").text(contentInfo);
-  $("#debug_background_info").text(backgroundInfo);
-  $("#debug_gdrive_info").text(gdriveInfo);
-  //$("#debug_gdrive_info").text(String(preferences["debugGdriveInfo"]));
+  if (browser && browser.extension && typeof browser.extension.getBackgroundPage === 'function') {
+    try {
+      background = browser.extension.getBackgroundPage();
+    } catch (err) {
+      console.warn('Failed to access background page for debug info', err);
+    }
+  }
 
+  if (background && background.SimpleGmailNotes) {
+    var sgno = background.SimpleGmailNotes;
+    var pageInfo = sgno.getLog(background.debugPageScope);
+    var contentInfo = sgno.getLog(background.debugContentScope);
+    var backgroundInfo = sgno.getLog(background.debugBackGroundScope);
+    var gdriveInfo = sgno.getLog(background.debugGdriveScope);
 
+    $("#debug_page_info").text(pageInfo);
+    $("#debug_content_info").text(contentInfo);
+    $("#debug_background_info").text(backgroundInfo);
+    $("#debug_gdrive_info").text(gdriveInfo);
+    return;
+  }
+
+  var unavailableMessage = "Debug information is unavailable. Please reproduce the issue in Gmail and copy the logs manually.";
+  $("#debug_page_info").text(unavailableMessage);
+  $("#debug_content_info").text(unavailableMessage);
+  $("#debug_background_info").text(unavailableMessage);
+  $("#debug_gdrive_info").text(unavailableMessage);
 }
 
 $(document).ready(function(){
