@@ -1063,7 +1063,7 @@ var setupOfflineNotice = function(){
   }
 
   var warningMessage = SGNC.offlineMessage;
-  var warningIconUrl = "https://www.simplegmailnotes.com/warning.3x.png";
+  var warningIconUrl = SGNC.getIconBaseUrl() + "/warning.3x.png";
   var warningNode = $("<div class='sgn_inactive_warning'><div class='sgn_offline_message'>" + 
                         "<img src='"+ warningIconUrl +"'>" +
                         warningMessage + "</div></div>");
@@ -1462,10 +1462,9 @@ var collectNoteProperties = function() {
 };
 
 var getLogoNode = function(className){
-   var imageNode = $("<img title='Powered By Bart Solutions'/>").attr("src", 
+   var imageNode = $("<img title='Simple Gmail Notes'/>").attr("src", 
                    SGNC.getLogoImageSrc("ed"));
-   return $("<a target='_blank'/>").attr("class",  className
-          ).attr('href', SGNC.getOfficalSiteUrl("ed")).append(imageNode);
+   return $("<span/>").attr("class", className + " sgn_brand_logo").append(imageNode);
 };
 
 var openCurrentOpportunity = function(email, opportunityId){
@@ -1702,7 +1701,7 @@ var setupNoteEditor = function(email, messageId){
             "")
     .hide();
 
-  searchLogoutPrompt.prepend(getLogoNode("sgn_bart_logo_top"));
+  searchLogoutPrompt.prepend(getLogoNode("sgn_brand_logo_top"));
 
   if(gCrmUserEmail){
     searchLogoutPrompt.find(".sgn_share_img").attr("title", "Share to CRM (" + gCrmUserEmail + ")");
@@ -1776,7 +1775,7 @@ var setupNoteEditor = function(email, messageId){
   injectionNode.prepend(loginPrompt);
   injectionNode.prepend(searchLogoutPrompt);
   injectionNode.prepend(emptyPrompt);
-  injectionNode.append(getLogoNode('sgn_bart_logo_bottom'));
+  injectionNode.append(getLogoNode('sgn_brand_logo_bottom'));
   // debugLog("@1329");
   $(".sgn_error").hide();
 

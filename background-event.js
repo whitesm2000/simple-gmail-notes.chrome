@@ -29,9 +29,12 @@ SGNC.getBrowser().runtime.onInstalled.addListener(function(details){
         alert("Thanks for installing. Please reload the Gmail page (click address bar & press enter key) to start using the extension!");
       }
       */
-      chrome.tabs.create({url: "https://www.bart.com.hk/simple-gmail-notes-installed/"}, function (tab) {
-          console.log("Welcome page launched");
-      });
+      var runtimeApi = SGNC.getBrowser().runtime;
+      if (typeof runtimeApi.openOptionsPage === 'function') {
+        runtimeApi.openOptionsPage();
+      } else {
+        SGNC.getBrowser().tabs.create({url: runtimeApi.getURL("options.html")});
+      }
       preferences["install_notification_done"] = "";
       preferences["upgrade_notification_done"] = true;
     } 

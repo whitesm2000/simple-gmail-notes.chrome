@@ -8,13 +8,13 @@
   margin: 5px 15px 5px 15px;
 }
 
-.sgn_container.sgn_position_top .sgn_bart_logo_bottom,
-.sgn_container.sgn_position_bottom .sgn_bart_logo_bottom {
+.sgn_container.sgn_position_top .sgn_brand_logo_bottom,
+.sgn_container.sgn_position_bottom .sgn_brand_logo_bottom {
     display: none
 }
 
-.sgn_container.sgn_position_side-top .sgn_bart_logo_top,
-.sgn_container.sgn_position_side-bottom .sgn_bart_logo_top {
+.sgn_container.sgn_position_side-top .sgn_brand_logo_top,
+.sgn_container.sgn_position_side-bottom .sgn_brand_logo_top {
     display: none
 }
 
@@ -177,7 +177,7 @@ div.sgn_opp_name{
   text-align: right;
 }
 
-.sgn_bart_logo{
+.sgn_brand_logo{
   display: inline-block;
 }
 

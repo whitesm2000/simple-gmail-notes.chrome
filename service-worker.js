@@ -234,20 +234,52 @@ const $ = {
         clearTimeout(timeoutId);
       }
       const ok = response.ok;
+      const contentType = response.headers.get('content-type') || '';
+      const inferredType = !config.dataType && contentType.includes('application/json')
+        ? 'json'
+        : (!config.dataType && contentType.startsWith('text/'))
+          ? 'text'
+          : undefined;
+      const dataType = config.dataType || inferredType;
       let payload;
+      let rawText;
+
       try {
-        if (config.dataType === 'json') {
-          payload = await response.json();
-        } else if (config.dataType === 'text' || !config.dataType) {
-          payload = await response.text();
-        } else if (config.dataType === 'blob') {
+        if (dataType === 'blob') {
           payload = await response.blob();
+        } else if (dataType === 'json') {
+          rawText = await response.text();
+          if (rawText && rawText.trim() !== '') {
+            try {
+              payload = JSON.parse(rawText);
+            } catch (parseErr) {
+              if (config.dataType === 'json') {
+                throw parseErr;
+              }
+              payload = rawText;
+            }
+          } else {
+            payload = rawText ? rawText : null;
+          }
         } else {
           payload = await response.text();
+          rawText = payload;
         }
       } catch (err) {
-        payload = null;
+        if (payload === undefined && rawText !== undefined) {
+          payload = rawText;
+        } else if (payload === undefined) {
+          payload = null;
+        }
+        if (dataType === 'json' && config.dataType === 'json' && typeof config.error === 'function') {
+          config.error(err, 'parsererror', err.message || 'parsererror');
+          return;
+        }
       }
+
+      const responseText = rawText !== undefined
+        ? rawText
+        : (typeof payload === 'string' ? payload : undefined);
 
       if (ok) {
         if (typeof config.success === 'function') {
@@ -258,7 +290,7 @@ const $ = {
           status: response.status,
           statusText: response.statusText,
           response: payload,
-          responseText: typeof payload === 'string' ? payload : undefined
+          responseText
         }, 'error', response.statusText);
       }
     }).catch((err) => {
@@ -285,24 +317,84 @@ self.addEventListener('unhandledrejection', function(event) {
   console.error('[SGN] bootstrap unhandled rejection', event.reason);
 });
 
+function finalizeBootstrap() {
+  if (typeof SimpleGmailNotes !== 'undefined' && !SimpleGmailNotes.$) {
+    SimpleGmailNotes.$ = $;
+  }
+}
+
+function tryImportScripts(urls) {
+  try {
+    importScripts.apply(self, urls);
+    return true;
+  } catch (err) {
+    console.error('[SGN] Failed to bootstrap background scripts', err && err.message ? err.message : err, err && err.stack ? err.stack : '');
+    return false;
+  }
+}
+
 function bootstrapBackground() {
   if (bootstrapped) {
     return;
   }
   bootstrapped = true;
-  try {
-    importScripts(
-      chrome.runtime.getURL('common/shared-common.js'),
-      chrome.runtime.getURL('background.js'),
-      chrome.runtime.getURL('background-event.js')
-    );
-  } catch (err) {
-    console.error('[SGN] Failed to bootstrap background scripts', err && err.message ? err.message : err, err && err.stack ? err.stack : '');
+
+  const sharedUrl = chrome.runtime.getURL('common/shared-common.js');
+  const backgroundUrls = [
+    chrome.runtime.getURL('background.js'),
+    chrome.runtime.getURL('background-event.js')
+  ];
+
+  if (tryImportScripts([sharedUrl].concat(backgroundUrls))) {
+    finalizeBootstrap();
+    return;
   }
 
-  if (typeof SimpleGmailNotes !== 'undefined' && !SimpleGmailNotes.$) {
-    SimpleGmailNotes.$ = $;
-  }
+  fetch(sharedUrl)
+    .then((resp) => {
+      console.log('[SGN] Prefetch shared-common status', resp.status);
+      if (!resp.ok) {
+        throw new Error('HTTP ' + resp.status);
+      }
+      return resp.text();
+    })
+    .then((source) => {
+      const globalUrl = typeof URL !== 'undefined' ? URL
+        : (typeof self !== 'undefined' && (self.URL || self.webkitURL))
+          ? (self.URL || self.webkitURL)
+          : null;
+
+      const canCreateObjectUrl = globalUrl && typeof globalUrl.createObjectURL === 'function';
+      const canRevokeObjectUrl = globalUrl && typeof globalUrl.revokeObjectURL === 'function';
+
+      if (canCreateObjectUrl) {
+        const blobUrl = globalUrl.createObjectURL(new Blob([source], { type: 'text/javascript' }));
+        const success = tryImportScripts([blobUrl].concat(backgroundUrls));
+        if (canRevokeObjectUrl) {
+          globalUrl.revokeObjectURL(blobUrl);
+        }
+        if (success) {
+          finalizeBootstrap();
+          return;
+        }
+      }
+
+      // Fallback: evaluate inline, then load remaining scripts.
+      try {
+        const evaluate = new Function(source + '\n//# sourceURL=' + sharedUrl);
+        evaluate();
+      } catch (err) {
+        console.error('[SGN] Failed to evaluate shared-common inline', err);
+        return;
+      }
+
+      if (tryImportScripts(backgroundUrls)) {
+        finalizeBootstrap();
+      }
+    })
+    .catch((err) => {
+      console.error('[SGN] Prefetch shared-common failed', err);
+    });
 }
 
 function hydrateCache(callback) {

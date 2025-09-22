@@ -175,50 +175,18 @@ SimpleGmailNotes.getExtensionTypeShortName = function(){
   return extensionTypeShortName;
 };
 
-SimpleGmailNotes.getLogoImageSrc = function(type){
-  return "https://www.simplegmailnotes.com/bart-logo.24.png" +
-           "?v=" + SimpleGmailNotes.getExtensionVersion() + 
-           "&from=" + SimpleGmailNotes.getBrowserShortName() + "-" + type +
-	   "-" + SimpleGmailNotes.getExtensionTypeShortName();
+SimpleGmailNotes.getLogoImageSrc = function(){
+  return SimpleGmailNotes.getIconBaseUrl() + "/icon.24.png";
 };
 
-SimpleGmailNotes.getSgnLogoImageSrc = function(type) {
-  return "https://api.lazycrm.com/media/sgn_logo.png" +
-           "?v=" + SimpleGmailNotes.getExtensionVersion() + 
-           "&from=" + SimpleGmailNotes.getBrowserShortName() + "-" + type;
-}
-
-SimpleGmailNotes.getBartLogoImageSrc = function(type) {
-  return "https://api.lazycrm.com/media/bart_logo_for_sgn.png" +
-           "?v=" + SimpleGmailNotes.getExtensionVersion() + 
-           "&from=" + SimpleGmailNotes.getBrowserShortName() + "-" + type;
-}
-
-SimpleGmailNotes.getWhiteLogoImageSrc = function(type){
-  return "https://www.simplegmailnotes.com/bart-logo-white.png" +
-           "?v=" + SimpleGmailNotes.getExtensionVersion() + 
-           "&from=" + SimpleGmailNotes.getBrowserShortName() + "-" + type;
-};
-
-SimpleGmailNotes.getContactUsUrl = function(type){
-  return "https://www.bart.com.hk/?from=" + SimpleGmailNotes.getBrowserShortName() + 
-              "-" + type + "#ContactUs-section";
-};
-
-SimpleGmailNotes.getOfficalSiteUrl = function(type){
-  return "https://www.bart.com.hk/?from=" + SimpleGmailNotes.getBrowserShortName() + 
-           "-" + type + "-" + SimpleGmailNotes.getExtensionTypeShortName();
-};
-
-SimpleGmailNotes.getDonationUrl = function(type){
-  return "http://www.simplegmailnotes.com/donation?from=" + 
-           SimpleGmailNotes.getBrowserShortName() + "-" + type;
+SimpleGmailNotes.getSgnLogoImageSrc = function(){
+  return SimpleGmailNotes.getIconBaseUrl() + "/crm-logo.24.png";
 };
 
 SimpleGmailNotes.getSupportUrl = function(){
   var url; 
   if(SimpleGmailNotes.isChrome())
-    url = "https://chrome.google.com/webstore/detail/simple-gmail-notes/" + SimpleGmailNotes.getExtensionID() + "/support?hl=en";
+    url = "https://chrome.google.com/webstore/detail/simple-gmail-notes/" + SimpleGmailNotes.getExtensionID() + "/support";
   else
     url = "https://addons.mozilla.org/en-US/firefox/addon/simple-gmail-notes/#reviews";
 
@@ -228,7 +196,7 @@ SimpleGmailNotes.getSupportUrl = function(){
 SimpleGmailNotes.getReviewUrl = function(){
   var url; 
   if(SimpleGmailNotes.isChrome())
-    url = "https://chrome.google.com/webstore/detail/simple-gmail-notes/" + SimpleGmailNotes.getExtensionID() + "/reviews?hl=en";
+    url = "https://chrome.google.com/webstore/detail/simple-gmail-notes/" + SimpleGmailNotes.getExtensionID() + "/reviews";
   else
     url = "https://addons.mozilla.org/en-US/firefox/addon/simple-gmail-notes/#reviews";
 

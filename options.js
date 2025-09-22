@@ -217,13 +217,7 @@ $(document).ready(function(){
     window.open(SGNO.getReviewUrl(), "_blank");
   });
 
-  $("#donation").attr("href", SGNO.getDonationUrl("pr"));
-  $("#contact_us").attr("href", SGNO.getOfficalSiteUrl("pr"));
+	pullPreferences();
 
-  $("#bart_logo").attr("href", SGNO.getOfficalSiteUrl("pr"));
-  $("#support").attr("href", SGNO.getSupportUrl());
-
-  pullPreferences();
-
-  initDebugMessage();
+	initDebugMessage();
 });

@@ -8,29 +8,28 @@ $(document).ready(function(){
   }
 
   $(".sgn-menu-table a").attr("target", "_blank");
+
   $("#open_options").click(function(){
     openTab("options.html");
     return false;
   });
 
+  $("#open_help").click(function(){
+    openTab("options.html");
+    return false;
+  });
+
+  $("#review").click(function(){
+    var url = SGNP.getReviewUrl();
+    window.open(url, "_blank");
+    return false;
+  });
+
   $("#support").click(function(){
     var url = SGNP.getSupportUrl();
-
     window.open(url, "_blank");
     return false;
   });
-
-  $("#donation").click(function(){
-    var url = SGNP.getDonationUrl("po");
-
-    window.open(url, "_blank");
-    return false;
-  });
-
-  $("#bart_logo").attr("href", SGNP.getOfficalSiteUrl("po"));
-  $("#bart_logo img").attr("src", SGNP.getLogoImageSrc("po"));
-
-  $("#hire_us").attr("href", SGNP.getContactUsUrl("po"));
 
 
 });

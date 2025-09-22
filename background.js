@@ -22,71 +22,25 @@ var settings = {
 
 
 var getSgnMessageForInstallOrUpgrade = function(type) {
-  var title = '';
-  var tipCardString = '';
-  var message = ''
-  if (type == "install") {
-    title = "Simple Gmail Notes Installed";
-    contentString = "<div class='title_tip'>" + 
-              "<div class='item sub_title'>How to use Simple Gmail Notes:</div>" +
-              "<div class='item tip_item'>1. Click any email</div>" +
-              "<div class='item tip_item'>2. Click 'log in' link at the top of email</div>" +
-              "<div class='item tip_item'>3. Write anything in the text area</div></div>";
+  var title = (type === "install") ? "Simple Gmail Notes Installed" : "Simple Gmail Notes Updated";
+  var body = "";
+
+  if (type === "install") {
+    body = "<div class='title_tip'>" +
+      "<div class='item sub_title'>Getting started:</div>" +
+      "<div class='item tip_item'>1. Open any email thread in Gmail.</div>" +
+      "<div class='item tip_item'>2. Use the 'log in' link above the note area to connect Google Drive.</div>" +
+      "<div class='item tip_item'>3. Type your note. It saves automatically.</div>" +
+      "</div>";
   } else {
-    title = "Simple Gmail Notes Updated";
-    contentString = "<div class='title_tip'>" +
-              "<div class='item sub_title'>New in " + SGNC.getExtensionVersion() + ":</div>" +
-              "<div class='item tip_item'>- Fixed alternate login URL for Chrome and Firefox</div>" + 
-              "<div class='item tip_item'>- Added customer portal URL for subscription review in preferences page</div>" + 
-            "</div>";
-    contentString += "<div class='item divide_line'></div>" + 
-              "<div class='title_tip'><div class='item sub_title'>Important:</div>" +
-              "<div class='item tip_item'>This is a difficult time for us because of COVID-19, if you do think the extension is useful, " +
-              "please <a target='_blank' href='https://www.bart.com.hk/simple-gmail-notes-support-package/?f=n2'>" +
-                "subscribe to SGN support package</a> to support the continuous development and maintenance of the extension. Thank you!</div>";
-
-    /*
-    contentString += "<div class='title_tip title_hint'>" +
-                  "<div class='item sub_title sub_hint_title'>Hint:</div>" + 
-                  "<div class='item tip_item'>- You could now view the notes in mobile devices " + 
-                  "(<a target='_blank' href='https://www.youtube.com/watch?v=vpBt36GibcY'>View Demo</a>)</div>" + 
-                  "<div class='item tip_item'>- If you do like the extension, please support our development " +
-                    " by subscribing to " +
-                    "<a target='_blank' href='https://www.bart.com.hk/simple-gmail-notes-support-package/?f=n'>Support Package</a></div></div>" +
-              "</div>";
-              */
+    body = "<div class='title_tip'>" +
+      "<div class='item sub_title'>What's new in " + SGNC.getExtensionVersion() + ":</div>" +
+      "<div class='item tip_item'>- Stability improvements and maintenance updates.</div>" +
+      "</div>";
   }
-  var gMessage = "<div class='title'><img class='sgn_logo' src="+ SGNC.getSgnLogoImageSrc('nt') + ">" + title + "</div>" +
-              contentString + 
-              "<div class='sgn_message_font' >Powered by" +
-                "<a  target='_blank' href='" + SGNC.getOfficalSiteUrl("nt") + "'>" +
-                  "<img src='" + SGNC.getBartLogoImageSrc("nt") + "'></a></div>";
-  return gMessage;
-}
 
-
-var gUpgradeMessage = "<div class='title'><img class='sgn_logo' src="+ SGNC.getSgnLogoImageSrc('nt') + ">" + "Simple Gmail Notes Updated</div>" +
-            "<div class='title_tip'><div class='item sub_title'>New in " + SGNC.getExtensionVersion() + ":</div>" +
-            "<div class='item tip_item'>- Enhancements for Mobile CRM</div>" + 
-            "</div>" +
-            "<div class='item divide_line'></div>" + 
-            "<div class='title_tip'><div class='item sub_title'>Subscribe to support package:</div>" +
-            "<div class='item tip_item'>- You could now view the notes in mobile devices " +
-            "(<a target='_blank' href='https://www.youtube.com/watch?v=vpBt36GibcY'>View Demo</a>)</div>" +
-            "<div class='item tip_item'>- If you do like the extension, please support our development " +
-              " by subscribing to " +
-              "<a target='_blank' href='https://www.bart.com.hk/simple-gmail-notes-support-package/?f=n'>Support Package</a></div></div>" +
-            "<div class='title_tip title_hint'>" +
-                "<div class='item sub_title sub_hint_title'>Hint:</div>" + 
-                "<div class='item tip_item'>- You could now view the notes in mobile devices " + 
-                "(<a target='_blank' href='https://www.youtube.com/watch?v=vpBt36GibcY'>View Demo</a>)</div>" + 
-                "<div class='item tip_item'>- If you do like the extension, please support our development " +
-                  " by subscribing to " +
-                  "<a target='_blank' href='https://www.bart.com.hk/simple-gmail-notes-support-package/?f=n'>Support Package</a></div></div>" +
-            "</div>" + 
-            "<div class='sgn_message_font' >Powered by" +
-              "<a  target='_blank' href='" + SGNC.getOfficalSiteUrl("nt") + "'>" +
-                "<img src='" + SGNC.getBartLogoImageSrc("nt") + "'></a></div>";
+  return "<div class='title'>" + title + "</div>" + body;
+};
 
 var gBadgeText = "";
 var gPreferenceTypes = [
@@ -1196,6 +1150,8 @@ var sendSummaryNotes = function(sender, pullList, resultList){
       shortDescription = SGNC.getSummaryLabel(description, preferences);
     }
     else{
+      console.warn('[sendSummaryNotes] no Drive note for', emailId);
+      SGNC.appendLog('[sendSummaryNotes] missing note:' + emailId + '\n', debugGdriveScope);
       emailId = gSgnEmtpy;
       description = gSgnEmtpy;
       shortDescription = gSgnEmtpy;

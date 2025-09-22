@@ -14,9 +14,9 @@
 
 - No tracking code is added.
 
-- See the extension website for the source code repository.
+- See the project repository for the source code.
 
-- Integrate with [Simple Mobile CRM](https://mobilecrm.io) (require extra sign in)
+- Optional mobile integration requires a separate companion service (additional sign-in may apply)
 
 **Dependencies (included in source code)**
 
@@ -45,10 +45,6 @@
 - <https://addons.mozilla.org/en-US/firefox/addon/simple-gmail-notes/>
 
 
-**More Technical Details**
- - <http://blog.walty8.com/simple-gmail-notes-chrome-extension/>
-
 **About Source Code Update**
 
 - To see the latest source code in production, one is always encouraged to use source code viewer like [Chrome extension source viewer](https://chrome.google.com/webstore/detail/chrome-extension-source-v/jifpbeccnghkjeaalbbjmodiffmgedin?hl=en), and directly inspect the source code from Chrome store. The source code is never obfuscated.
-
